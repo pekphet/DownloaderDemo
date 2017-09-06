@@ -33,9 +33,9 @@ class DownloadService : Service() {
         }
 
         override fun startDownload(url: String, tag: String, fileName: String, fileSize: Long) {
-            Log.e(TAG, "start dl: $url")
+            Log.e(TAG, "start download")
             mDownloadMapper.put(tag, Downloader.createDownloadInfo(url, tag, fileName, fileSize))
-            ThreadPool.addTask { Downloader().get(mDownloadMapper.get(tag)?:return@addTask, mDownloadCKSender) }
+            ThreadPool.addTask(Downloader().get(mDownloadMapper.get(tag) ?: return, mDownloadCKSender))
         }
 
         override fun cancelDownloadByTag(tag: String?) {
@@ -47,6 +47,7 @@ class DownloadService : Service() {
         }
 
         override fun registerCB(ck: IBinder?) {
+            Log.e(TAG, "reg")
             mCKs.add(ck as? IDownloadCK ?: return)
         }
 
@@ -60,20 +61,24 @@ class DownloadService : Service() {
         }
 
         override fun onProgress(tag: String?, pg: Double) {
-            mCKs.map { it.onProgress(tag, pg)}
+            Log.e(TAG, "pg:$pg")
+            mCKs.map { it.onProgress(tag, pg) }
         }
 
         override fun onComplete(tag: String?, filePath: String?) {
+            Log.e(TAG, "complete:$filePath")
             mCKs.map { it.onComplete(tag, filePath) }
             mDownloadMapper.remove(tag)
         }
 
         override fun onFailed(tag: String?, msg: String?) {
+            Log.e(TAG, "failed:$msg")
             mCKs.map { it.onFailed(tag, msg) }
             mDownloadMapper.remove(tag)
         }
 
         override fun onCanceled(tag: String?) {
+            Log.e(TAG, "Cancel:$tag")
             mCKs.map { it.onCanceled(tag) }
             mDownloadMapper.remove(tag)
 
@@ -84,12 +89,10 @@ class DownloadService : Service() {
     val mCKs = ArrayList<IDownloadCK>()
 
     override fun onCreate() {
-        Log.e(TAG, "ON CREATE")
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.e(TAG, "ON START COMMAND")
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -106,21 +109,25 @@ data class DownloadInfo(val tag: String, val url: String, val fileName: String, 
 
 class Downloader {
     companion object {
-        private val BUF_SIZE = 256 * 1024
+        private val BUF_SIZE = 128 * 1024
+        val TAG = "fish downloader"
         fun createDownloadInfo(url: String, tag: String, fileName: String, fileSize: Long)
                 = DownloadInfo(tag, url, fileName, "", fileSize, 0, false)
     }
 
     private fun createFile(info: DownloadInfo) = File(DownloadService.DOWNLOAD_DIR, "${info.fileName}").apply {
+        Log.e(TAG, "CREATE FILE")
         if (!parentFile.exists()) parentFile.mkdirs()
         if (exists()) delete()
         createNewFile()
     }
 
-    fun get(info: DownloadInfo, ck: IDownloadCK) = {
+    fun get(info: DownloadInfo, ck: IDownloadCK) = Runnable {
         try {
             val connection = URL(info.url).openConnection() as HttpURLConnection
+            Log.e(TAG, "url connected!")
             if (connection.responseCode == 200) {
+                Log.e(TAG, "code:${connection.responseCode}")
                 if (connection.contentLength != 0) info.fileSize = connection.contentLength.toLong()
                 val f = createFile(info)
                 info.filePath = f.absolutePath

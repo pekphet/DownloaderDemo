@@ -87,7 +87,6 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?, defSA: Int, defRes: Int) :
                 }
             }
         }
-
         context.bindService(Intent(context, DownloadService::class.java), object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
                 Log.e("remote service", "disconnected")
