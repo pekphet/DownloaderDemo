@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#ffffff">
+    <ImageView
+        android:id="@+id/img_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#26d054"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/progress_top"/>
+
+    <TextView
+        android:id="@+id/tv_pg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"/>
+</FrameLayout>
