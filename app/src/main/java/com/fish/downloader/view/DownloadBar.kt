@@ -5,7 +5,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -26,12 +28,14 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?, defSA: Int, defRes: Int) :
     constructor(ctx: Context, attrs: AttributeSet?) : this(ctx, attrs, 0, 0)
     constructor(ctx: Context, attrs: AttributeSet?, defSA: Int) : this(ctx, attrs, defSA, 0)
 
-    val DOWNLOADING_COLOR = 0xFF26D054
-    val COMPLETE_COLOR = 0xFF5AA3E0
+    val DOWNLOADING_COLOR: Int = 0xFF26D054.toInt()
+    val COMPLETE_COLOR: Int = 0xFF5AA3E0.toInt()
 
     init {
         View.inflate(context, R.layout.v_download_bar, this)
     }
+
+    val mHandler = Handler(Looper.getMainLooper())
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -40,7 +44,7 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?, defSA: Int, defRes: Int) :
 
     private fun initView() {
         mTvPG.text = mInitText
-        mImgPG.setBackgroundColor(DOWNLOADING_COLOR.toInt())
+        mImgPG.setBackgroundColor(DOWNLOADING_COLOR)
         Log.e("attach to win", "att")
     }
 
@@ -64,12 +68,14 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?, defSA: Int, defRes: Int) :
             override fun basicTypes(anInt: Int, aLong: Long, aBoolean: Boolean, aFloat: Float, aDouble: Double, aString: String?) {}
 
             override fun onProgress(tag2: String?, pg: Double) {
+//                Log.e("ON PG", "MTAG:$tag ,TAG:$tag2, pg:$pg")
                 if (tag2.equals(tag))
                     progress(pg)
             }
 
             override fun onComplete(tag2: String?, filePath: String?) {
                 if (tag2.equals(tag)) {
+                    Log.e("complete in view", tag2)
                     complete(filePath)
                     dlck(CK_TYPE.COMPLETE, filePath)
                 }
@@ -102,12 +108,16 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?, defSA: Int, defRes: Int) :
     }
 
     private fun complete(filePath: String?) {
-        mImgPG.setBackgroundColor(COMPLETE_COLOR.toInt())
+        mHandler.post {
+            mImgPG.setBackgroundColor(COMPLETE_COLOR)
+        }
     }
 
     private fun progress(pg: Double) {
-        mTvPG.text = String.format("下载中  %.2f%%", pg)
-        mImgPG.layoutParams = mTvPG.layoutParams.apply { width = (width * pg).toInt() }
+        mHandler.post {
+            mTvPG.text = String.format("下载中  %.2f%%", pg * 100)
+            mImgPG.layoutParams = mImgPG.layoutParams.apply { width = (this@DownloadBar.width * pg).toInt() }
+        }
     }
 
     enum class CK_TYPE {COMPLETE, CANCELED, FAILED }

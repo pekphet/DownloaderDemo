@@ -48,11 +48,13 @@ class DownloadService : Service() {
 
         override fun registerCB(ck: IBinder?) {
             Log.e(TAG, "reg")
-            mCKs.add(ck as? IDownloadCK ?: return)
+            Log.e(TAG, "CKS LEN:${mCKs.size}")
+            mCKs.add(IDownloadCK.Stub.asInterface(ck))
+            Log.e(TAG, "CKS LEN:${mCKs.size}")
         }
 
         override fun unregisterCB(ck: IBinder?) {
-            mCKs.remove(ck as? IDownloadCK ?: return)
+            mCKs.remove(IDownloadCK.Stub.asInterface(ck))
         }
     }
 
@@ -61,7 +63,7 @@ class DownloadService : Service() {
         }
 
         override fun onProgress(tag: String?, pg: Double) {
-            Log.e(TAG, "pg:$pg")
+//            Log.e(TAG, "pg:$pg")
             mCKs.map { it.onProgress(tag, pg) }
         }
 
@@ -109,7 +111,7 @@ data class DownloadInfo(val tag: String, val url: String, val fileName: String, 
 
 class Downloader {
     companion object {
-        private val BUF_SIZE = 128 * 1024
+        private val BUF_SIZE = 2 * 1024
         val TAG = "fish downloader"
         fun createDownloadInfo(url: String, tag: String, fileName: String, fileSize: Long)
                 = DownloadInfo(tag, url, fileName, "", fileSize, 0, false)
@@ -129,6 +131,7 @@ class Downloader {
             if (connection.responseCode == 200) {
                 Log.e(TAG, "code:${connection.responseCode}")
                 if (connection.contentLength != 0) info.fileSize = connection.contentLength.toLong()
+                Log.e(TAG, "lenth:${info.fileSize}")
                 val f = createFile(info)
                 info.filePath = f.absolutePath
                 val fos = FileOutputStream(f)
@@ -137,12 +140,16 @@ class Downloader {
                 var readCnt = 0
                 val buf = ByteArray(BUF_SIZE)
                 do {
-                    readCnt = netIS.read(buf, downloadPtr, BUF_SIZE)
-                    fos.write(buf)
+                    readCnt = netIS.read(buf, 0, BUF_SIZE)
+                    if (readCnt == -1)
+                        break
+                    fos.write(buf, 0, readCnt)
                     fos.flush()
+                    Log.e(TAG, "dptr:$downloadPtr, readCnt:$readCnt, BUF SIZE: $BUF_SIZE")
                     downloadPtr += readCnt
                     ck.onProgress(info.tag, downloadPtr * 1.0 / info.fileSize)
-                } while (readCnt != 0 && !info.cancelSignal)
+                } while (readCnt > 0 && !info.cancelSignal)
+                Log.e(TAG, "exit looper")
                 try {
                     fos.close()
                     netIS.close()

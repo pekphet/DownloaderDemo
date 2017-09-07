@@ -34,4 +34,4 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-fun Activity.Tst(msg: String) = Toast.makeText(this@Tst, msg, Toast.LENGTH_SHORT).show()
+fun Activity.Tst(msg: String) = runOnUiThread { Toast.makeText(this@Tst, msg, Toast.LENGTH_SHORT).show() }
