@@ -42,8 +42,9 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?, defSA: Int, defRes: Int) :
     val mBG by bid<FrameLayout>(R.id.fl_dlbar_bg)
     val mMask by bid<ImageView>(R.id.img_dlbar_mask)
 
-    var mConf = DownloadBarConfigure()
+    var mConf = DownloadBarConfigure { initView() }
         set(conf) {
+            Log.e("SET CONF", "DO")
             field = conf
             initView()
         }
@@ -113,6 +114,7 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?, defSA: Int, defRes: Int) :
     }
 
     private fun chgDownloadUI() {
+        mFlPG.layoutParams = mFlPG.layoutParams.apply { width = 0 }
         if (mConf.downloadingBGRes == null) mFlPG.setBackgroundColor(mConf.downloadingBGColor) else mFlPG.setBackgroundResource(mConf.downloadingBGRes ?: return)
     }
 
@@ -142,5 +144,6 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?, defSA: Int, defRes: Int) :
                                     var downloadingBGColor: Int = DownloadBar.DOWNLOADING_COLOR, var completeBGColor: Int = DownloadBar.COMPLETE_COLOR,
                                     var downloadingBGRes: Int? = null, var completeBGRes: Int? = null,
                                     var baseBGColor: Int = 0xffffffff.toInt(), var baseBGRes: Int? = null,
-                                    var maskRes: Int = R.drawable.progress_top, var pogressCK: (parentView: View, progressBar: FrameLayout, pg: Double) -> Unit = { view, img, pg -> img.layoutParams = img.layoutParams.apply { this@apply.width = (view.width * pg).toInt() } })
+                                    var maskRes: Int = R.drawable.progress_top, var pogressCK: (parentView: View, progressBar: FrameLayout, pg: Double) -> Unit = { view, img, pg -> img.layoutParams = img.layoutParams.apply { this@apply.width = (view.width * pg).toInt() } },
+                                    val notifyConfigureChanged: () -> Unit)
 }

@@ -3,6 +3,8 @@ package com.fish.downloader
 import android.app.Activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import com.fish.downloader.extensions.bid
 import com.fish.downloader.view.DownloadBar
@@ -15,6 +17,20 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        mDnBar.mConf.apply {
+            initText = "NOT DEFAULT DOWNLOAD!"
+            downloadingText = "%.0f%%"
+            downloadingBGColor = 0xFFFF22D6.toInt()
+            completeText = "COMPLETE!!"
+        }
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            mDnBar.mConf.apply {
+                initBGColor = 0xfff6f339.toInt()
+            }.notifyConfigureChanged.invoke()
+        }, 1000)
+
+
         mDnBar.setOnClickListener {
             if (!enableDownload) return@setOnClickListener
             enableDownload = false
