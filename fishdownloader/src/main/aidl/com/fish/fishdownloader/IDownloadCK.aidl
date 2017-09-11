@@ -1,5 +1,5 @@
 // IDownloadCK.aidl
-package com.fish.downloader;
+package com.fish.fishdownloader;
 
 // Declare any non-default types here with import statements
 

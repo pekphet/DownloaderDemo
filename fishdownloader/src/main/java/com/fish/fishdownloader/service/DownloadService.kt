@@ -5,15 +5,16 @@ import android.content.Intent
 import android.os.Environment
 import android.os.IBinder
 import android.util.Log
-import com.fish.downloader.IDownloadCK
-import com.fish.downloader.IDownloader
 import com.fish.downloader.framework.ThreadPool
+import com.fish.fishdownloader.IDownloadCK
+import com.fish.fishdownloader.IDownloader
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
 
 /**
  * Created by fish on 17-9-6.

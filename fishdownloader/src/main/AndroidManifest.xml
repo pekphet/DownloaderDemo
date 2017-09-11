@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.fish.fishdownloader">
+
+
+    <application>
+        <service
+            android:name="com.fish.downloader.service.DownloadService"
+            android:exported="false"
+            android:process=":download" />
+
+    </application>
+
+</manifest>

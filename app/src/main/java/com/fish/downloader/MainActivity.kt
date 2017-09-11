@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
             mDnBar.download("http://45.78.46.200:42002/docker_practice.pdf", "docker",
                     "docker.pdf", 123L) { type, msg ->
                 run {
+                    mDnBar.disconnectService()
                     when (type) {
                         DownloadBar.CK_TYPE.COMPLETE -> Tst("下载成功：${msg}")
                         DownloadBar.CK_TYPE.FAILED -> Tst("下载失败：${msg}")

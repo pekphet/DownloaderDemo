@@ -17,10 +17,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name="com.fish.downloader.service.DownloadService"
-            android:exported="false"
-            android:process=":download"/>
     </application>
 
 </manifest>
