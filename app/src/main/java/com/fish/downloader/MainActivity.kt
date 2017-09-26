@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
             }.notifyConfigureChanged.invoke()
         }, 1000)
 
-
         mDnBar.setOnClickListener {
             if (!enableDownload) return@setOnClickListener
             enableDownload = false
@@ -48,7 +47,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 }
 
 fun Activity.Tst(msg: String) = runOnUiThread { Toast.makeText(this@Tst, msg, Toast.LENGTH_SHORT).show() }

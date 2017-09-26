@@ -7,6 +7,8 @@
 
     <com.fish.downloader.view.DownloadBar
         android:layout_marginTop="300dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
         android:id="@+id/vdb"
         android:layout_width="match_parent"
         android:layout_height="50dp"/>
